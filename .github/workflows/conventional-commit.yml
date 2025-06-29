@@ -16,6 +16,8 @@ jobs:
   update-labels:
     name: Update Labels
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write # Needed to post comments & update labels
     # Prevent double triggers: skip pull_request runs for forks (pull_request_target will handle them)
     if: |
       github.event_name == 'pull_request_target' ||
