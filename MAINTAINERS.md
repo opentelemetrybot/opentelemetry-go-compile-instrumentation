@@ -39,6 +39,6 @@ This document contains a list of maintainers in this repo. See [opensearch-proje
 
 ## Emeritus Maintainers
 
-| Name              | GitHub ID                                   | Affiliation |
-| ----------------- | ------------------------------------------- | ----------- |
-| Dinesh Gurumurthy | [dineshg13](https://github.com/dineshg13)   | Datadog     |
+| Name              | GitHub ID                                   |
+| ----------------- | ------------------------------------------- |
+| Dinesh Gurumurthy | [dineshg13](https://github.com/dineshg13)   |
