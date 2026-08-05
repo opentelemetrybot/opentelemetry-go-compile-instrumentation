@@ -179,6 +179,39 @@ func TestPackageNameFilter_Match(t *testing.T) {
 	}
 }
 
+func TestDirectiveFilter_Match(t *testing.T) {
+	tests := []struct {
+		name      string
+		src       string
+		directive string
+		want      bool
+	}{
+		{
+			name:      "directive present",
+			src:       "//go:build linux\npackage main\n\nfunc foo() {}\n",
+			directive: "go:build",
+			want:      true,
+		},
+		{
+			name:      "directive missing",
+			src:       "package main\n",
+			directive: "go:build",
+			want:      false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := parseSource(t, tt.src)
+			f := &setup.DirectiveFilter{Directive: tt.directive}
+			if got := f.Match(ctx); got != tt.want {
+				t.Fatalf("DirectiveFilter{Directive:%q}.Match() = %v, want %v",
+					tt.directive, got, tt.want)
+			}
+		})
+	}
+}
+
 // --- Build ---
 
 func TestBuild_NilWhere(t *testing.T) {
@@ -374,10 +407,6 @@ func TestBuild_ErrorCases(t *testing.T) {
 		{
 			name:  "where selector composition unsupported",
 			where: &rule.WhereDef{Func: "Foo"},
-		},
-		{
-			name:  "where.file.has_directive unsupported",
-			where: &rule.WhereDef{File: &rule.FilterDef{HasDirective: "otelc:span"}},
 		},
 	}
 	for _, tt := range tests {
@@ -658,6 +687,7 @@ type filterExpected struct {
 	Recv        string `yaml:"recv"`
 	Struct      string `yaml:"struct"`
 	Package     string `yaml:"package"`
+	Directive   string `yaml:"directive"`
 	ShouldMatch *bool  `yaml:"should_match"`
 	// Children describes the expected sub-filters for combinator types
 	// (e.g. AllOf). It is nil for leaf filters.
@@ -745,6 +775,14 @@ func assertBuiltFilter(t *testing.T, name string, got setup.Filter, want filterE
 		}
 		if structFilter.Struct != want.Struct {
 			t.Fatalf("Build(%q) = %+v, want struct=%q", name, structFilter, want.Struct)
+		}
+	case "DirectiveFilter":
+		directiveFilter, ok := got.(*setup.DirectiveFilter)
+		if !ok {
+			t.Fatalf("Build(%q) = %T, want *setup.DirectiveFilter", name, got)
+		}
+		if directiveFilter.Directive != want.Directive {
+			t.Fatalf("Build(%q) = %+v, want directive=%q", name, directiveFilter, want.Directive)
 		}
 	case "PackageNameFilter":
 		pnf, ok := got.(*setup.PackageNameFilter)
