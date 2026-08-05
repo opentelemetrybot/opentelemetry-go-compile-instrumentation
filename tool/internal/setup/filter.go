@@ -93,7 +93,9 @@ type StructFilter struct {
 }
 
 func (f *StructFilter) Match(ctx *MatchContext) bool {
-	return ast.FindStructDecl(ctx.AST, f.Struct) != nil
+	// Only true structs match; an interface or alias of the same name does not.
+	// This inverts under `not`, which now includes files it once excluded.
+	return ast.FindStructType(ctx.AST, f.Struct) != nil
 }
 
 // PackageNameFilter matches source files whose declared package clause equals
