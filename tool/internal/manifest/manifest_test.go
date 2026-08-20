@@ -127,7 +127,7 @@ func TestLoadModuleEntriesRejectsEscapingRuleSymlink(t *testing.T) {
 }
 
 func TestLoad(t *testing.T) {
-	got, err := Load()
+	got, err := load()
 	require.NoError(t, err)
 	require.NotEmpty(t, got)
 
