@@ -666,7 +666,7 @@ func TestLoadRulesFromToolFiles(t *testing.T) {
 			false, nil)
 
 		_, err := loadRulesFromToolFiles(t.Context(), []string{rootTool})
-		require.ErrorIs(t, err, ErrNotInstrumentation)
+		require.ErrorIs(t, err, errNotInstrumentation)
 	})
 }
 
@@ -723,7 +723,7 @@ func TestLoadDefaultRules(t *testing.T) {
 	require.Equal(t, "dummyrule", rules[0].GetName()) // writeInstrumentationModule adds a rule named "dummyrule"
 
 	// Verify that when no rules are found, no error is returned and nil is returned.
-	os.Remove(filepath.Join(tmp, ToolFileCanonical))
+	os.Remove(filepath.Join(tmp, toolFileCanonical))
 	rules, err = sp.loadRules(t.Context(), moduleDirs)
 	require.NoError(t, err)
 	require.Nil(t, rules)
@@ -1021,8 +1021,8 @@ func TestPreciseMatching_WhereFileFilterBuildError(t *testing.T) {
 
 // Helper functions for constructing test data
 
-func newTestSetupPhase() *SetupPhase {
-	return &SetupPhase{
+func newTestSetupPhase() *setupPhase {
+	return &setupPhase{
 		logger: slog.New(slog.NewTextHandler(io.Discard, nil)),
 	}
 }
@@ -1526,7 +1526,7 @@ func TestRunMatch_WarnsOnUnresolvedVersion(t *testing.T) {
 	const importPath = "example.com/mypkg"
 
 	var buf bytes.Buffer
-	sp := &SetupPhase{
+	sp := &setupPhase{
 		logger: slog.New(slog.NewTextHandler(&buf, &slog.HandlerOptions{Level: slog.LevelWarn})),
 	}
 
@@ -1868,9 +1868,9 @@ func TestMatchDeps_RunMatchError(t *testing.T) {
 func TestLoadRules_FindToolFilesError(t *testing.T) {
 	t.Setenv(util.EnvOtelcRules, "")
 	dir := t.TempDir()
-	err := os.WriteFile(filepath.Join(dir, ToolFileCanonical), []byte("package main"), 0o644)
+	err := os.WriteFile(filepath.Join(dir, toolFileCanonical), []byte("package main"), 0o644)
 	require.NoError(t, err)
-	err = os.WriteFile(filepath.Join(dir, ToolFileAlias), []byte("package main"), 0o644)
+	err = os.WriteFile(filepath.Join(dir, toolFileAlias), []byte("package main"), 0o644)
 	require.NoError(t, err)
 
 	sp := newTestSetupPhase()
