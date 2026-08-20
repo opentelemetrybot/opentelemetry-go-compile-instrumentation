@@ -186,7 +186,7 @@ func loadModuleRules(moduleDir, module string, loaded map[string][]yamlRule) err
 			return nil
 		}
 
-		if !isRuleFile(d.Name()) {
+		if !util.IsRuleFile(d.Name()) {
 			return nil
 		}
 
